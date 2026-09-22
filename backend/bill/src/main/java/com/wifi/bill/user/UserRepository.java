@@ -1,7 +1,8 @@
 package com.wifi.bill.user;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -12,4 +13,3 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhone(String phone);
 
 }
-8056f0bd-f446-4bfb-9499-02eb2cfc6662

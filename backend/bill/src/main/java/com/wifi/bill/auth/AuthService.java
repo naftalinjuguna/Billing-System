@@ -13,10 +13,12 @@ public class AuthService {
 
     private final UserRepository userRepository; 
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public void register(RegisterRequest request) {
@@ -39,6 +41,30 @@ public class AuthService {
         user.setEnabled(true);
 
         userRepository.save(user);
+    }
+
+    public AuthResponse login(LoginRequest request) {
+
+        User user = userRepository.findByEmail(request.email())
+            .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.password(),user.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        if (!user.isEnabled()) {
+            throw new RuntimeException("Account is disabled");
+        }
+
+        String token = jwtService.generateToken(user);
+
+        return new AuthResponse(
+            token,
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getRole().name()
+        );
     }
 
 }
